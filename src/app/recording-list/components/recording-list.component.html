@@ -1,0 +1,10 @@
+<Page>
+    <GridLayout class="page">
+        <ListView [items]="recordings" (itemTap)="onItemTap($event)">
+            <ng-template let-recording="item" let-i="index">
+                <!-- The item template can only have a single root view container (e.g. GridLayout, StackLayout, etc.)-->
+                    <Label [text]="recording.name"></Label>
+            </ng-template>
+        </ListView>
+    </GridLayout>
+</Page>

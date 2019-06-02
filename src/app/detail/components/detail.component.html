@@ -1,0 +1,104 @@
+<Page (loaded)="pageLoaded($event)" (unloaded)="pageUnloaded()">
+    <GridLayout height="100%" width="100%">
+
+        <!-- <GridLayout *ngIf="isRendering" height="100%" width="100%" verticalAlignment="top" rows="auto" columns="*"> -->
+        <!-- <StackLayout row="0" col="0" width="100%" height="35%" (tap)="onTitleClick()">
+                <GridLayout width="100%" height="100%" rows="*" columns="*">
+                    <Image row="0" col="0" stretch="aspectFill" [src]="thumbnail"></Image>
+                    <GridLayout height="100%" width="100%" backgroundColor="transparent">
+                        <Button class="videoPlayButton" (tap)="onTitleClick()"></Button>
+                    </GridLayout>
+                </GridLayout>
+            </StackLayout>
+
+            <StackLayout verticalAlignment="middle" horizontalAlignment="left" row="1" col="0" backgroundColor="#ffffff"
+                width="100%" height="7.5%">
+                <Label margin="10" class="text-center" textWrap="true" [text]="songName" color="black"></Label>
+            </StackLayout> -->
+
+        <!-- <GridLayout columns="*,*" row="2" col="0" backgroundColor="#f1f1f1" height="12.5%">
+                <StackLayout margin="10" col="0" verticalAlignment="middle" horizontalAlignment="left">
+                    <Label textWrap="true" [text]="songName"></Label>
+                </StackLayout>
+                <StackLayout margin="10" col="1" verticalAlignment="top" horizontalAlignment="right">
+                    <Label></Label>
+                </StackLayout>
+            </GridLayout> -->
+        <!-- <StackLayout *ngIf="!isLoadingComments" backgroundColor="#f1f1f1" row="0" col="0" height="40.5%">
+                <ListView *ngIf="!noComments" [items]="comments" height="100%" separatorColor="gray">
+                    <ng-template let-item="item">
+                        <GridLayout rows="auto, auto" columns="auto, auto, auto">
+                            <Image margin="10" col="0" row="0" width="45" height="45" src="res://img_avatar"></Image>
+                            <StackLayout row="0" col="1" verticalAlignment="center">
+                                <Label class="site-template-title" [text]="item.createdBy.id"></Label>
+                                <Label class="site-template-description" [text]="item.comments[0].text"></Label>
+                            </StackLayout>
+                        </GridLayout>
+                    </ng-template>
+                </ListView>
+
+                <GridLayout *ngIf="noComments">
+                    <Label verticalAlignment="middle" horizontalAlignment="center" text="No Comments"></Label>
+                </GridLayout>
+
+            </StackLayout> -->
+
+        <ListView [items]="songs" height="100%" separatorColor="gray"  (itemTap)="onSongTap($event)">
+            <ng-template let-item="item" let-i="index">
+                <GridLayout rows="auto, auto" columns="auto, auto, auto"
+                    height="10%">
+                    <Image margin="10" col="0" row="0" width="45" height="45" src="res://mic">
+                    </Image>
+                    <StackLayout row="0" col="1" verticalAlignment="center" height="40">
+                        <!-- <Label class="site-template-title" [text]="item.createdBy.id"></Label> -->
+                        <Label class="site-template-description" [text]="item.title"></Label>
+                    </StackLayout>
+                </GridLayout>
+            </ng-template>
+        </ListView>
+
+        <!-- <GridLayout *ngIf="noComments">
+                    <Label verticalAlignment="middle" horizontalAlignment="center" text="No Comments"></Label>
+                </GridLayout> -->
+
+
+        <!-- <GridLayout *ngIf="isLoadingComments" row="3" col="0" height="40.5%">
+                <ActivityIndicator horizontalAlignment="center" verticalAlignment="middle" [busy]="isLoadingComments"
+                    rowSpan="1" colSpan="1">
+                </ActivityIndicator>
+
+            </GridLayout> -->
+
+
+        <!-- <GridLayout columns="*,*" backgroundColor="black" row="4" col="0" height="5%" width="100%">
+
+                <GridLayout col="0" width="100%" columns="auto,auto" orientation="horizontal"
+                    horizontalAlignment="left">
+                    <Image col="0" src="res://ic_icon_view_video" verticalAlignment="middle"></Image>
+                    <Label col="1" text="{{songViews==undefined?0:songViews+' views'}}" color="white"
+                        verticalAlignment="middle"></Label>
+
+                </GridLayout>
+
+                <StackLayout col="1" width="100%" orientation="horizontal" horizontalAlignment="right">
+                    <Image [class]="favouriteClass" stretch="fill" (tap)="onFavouriteClick()"></Image>
+                    <Image class="videoshare" stretch="fill"></Image>
+                    <Image class="videocomment" stretch="fill" (tap)="onCommentClick()"></Image>
+                </StackLayout>
+            </GridLayout>
+        </GridLayout>
+
+        <GridLayout *ngIf="!isRendering" width="100%" height="100%">
+            <ActivityIndicator horizontalAlignment="center" verticalAlignment="middle" [busy]="!isRendering" rowSpan="1"
+                colSpan="1">
+            </ActivityIndicator>
+        </GridLayout>
+
+        <GridLayout *ngIf="isFavouring" backgroundColor="transparent" width="100%" height="100%">
+            <ActivityIndicator backgroundColor="transparent" horizontalAlignment="center" verticalAlignment="middle"
+                [busy]="isFavouring" rowSpan="1" colSpan="1">
+            </ActivityIndicator>
+        </GridLayout> -->
+        <!-- </GridLayout> -->
+    </GridLayout>
+</Page>

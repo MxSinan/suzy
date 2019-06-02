@@ -1,0 +1,38 @@
+<Page>
+    <GridLayout class="page" rows="auto,auto,auto" backgroundColor="red">
+        <GridLayout class="heading-container" row="0" columns="auto,auto,auto">
+            <StackLayout col="0" width="25%"></StackLayout>
+            <Label col="1" class="heading" text="Suzy Recorder"></Label>
+            <StackLayout class="list-button-container" col="2" (tap)="onListTap()">
+                <Image class="list-button" src="res://recording_list"></Image>
+            </StackLayout>
+        </GridLayout>
+        <StackLayout class="recorder-logo-container" row="1">
+            <Image class="recorder-logo" src="res://mic"></Image>
+        </StackLayout>
+        <GridLayout class="recording-functions-container" row="2" columns="*,*,*">
+            <StackLayout class="record-button-container" col="0" (tap)="onStopTap()">
+                <Image class="record-stop-button" src="res://recording_start"></Image>
+                <Label class="button-label" text="Stop"></Label>
+            </StackLayout>
+            <StackLayout class="record-button-container" col="1" (tap)="onStartTap()">
+                <Image class="record-start-button" src="res://recording_start"></Image>
+                <Label class="button-label" text="Start"></Label>
+            </StackLayout>
+            <StackLayout class="play-button-container" col="2">
+                <StackLayout (tap)="onPlayPauseTap()">
+                    <Image *ngIf="showPlay" class="playpause-button" src="res://play"></Image>
+                    <Image *ngIf="showPause" class="playpause-button" src="res://pause"></Image>
+                </StackLayout>
+                <GridLayout class="confirm-container" columns="*,*">
+                    <StackLayout *ngIf="showConfirm" class="confirm-label" col="0" (tap)="onConfirmTap()">
+                        <Image src="res://yes"> </Image>
+                    </StackLayout>
+                    <StackLayout *ngIf="showConfirm" class="confirm-label" col="1" (tap)="onCancelTap()">
+                        <Image src="res://no"></Image>
+                    </StackLayout>
+                </GridLayout>
+            </StackLayout>
+        </GridLayout>
+    </GridLayout>
+</Page>
