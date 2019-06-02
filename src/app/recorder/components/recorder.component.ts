@@ -4,9 +4,9 @@ import { RouterExtensions } from "nativescript-angular/router"
 import * as fs from "tns-core-modules/file-system";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import * as CryptoJS from 'crypto-js'
-// import { fileToBase64 } from "file-base64-util";
-// import * as base64 from "file-base64";
 import { Buffer } from 'buffer'
+import * as btoa from 'btoa'
+import * as atob from 'atob'
 
 @Component({
     selector: "Recorder",
@@ -33,7 +33,6 @@ export class RecorderComponent {
         this.recorder = new TNSRecorder();
         this.player = new TNSPlayer();
         this.audioFolder = fs.knownFolders.currentApp().getFolder('audio')
-        // this.addd = '/storage/emulated/0';
 
         this.recorderOptions = {
             filename: this.audioFolder.path + '/recording.mp3',
@@ -65,6 +64,7 @@ export class RecorderComponent {
     onStopTap() {
         this.recorder.stop();
         this.recordingFile = fs.File.fromPath(fs.path.join(fs.knownFolders.currentApp().getFolder('audio').path, 'recording.mp3'));
+        this.getBase64(this.recordingFile)
         console.log('File:', this.recordingFile.path);
         if (this.recordingFile.path != null) {
             this.showPlay = true;
@@ -86,7 +86,6 @@ export class RecorderComponent {
     private _trackComplete(args: any) {
         console.log('reference back to player:', args.player);
 
-        // iOS only: flag indicating if completed successfully
         console.log('whether song play completed successfully:', args.flag);
         this.showPause = false;
         this.showPlay = true;
@@ -96,7 +95,6 @@ export class RecorderComponent {
         console.log('reference back to player:', args.player);
         console.log('the error:', args.error);
 
-        // Android only: extra detail on error
         console.log('extra info on the error:', args.extra);
     }
 
@@ -110,8 +108,6 @@ export class RecorderComponent {
         };
         this.player.playFromFile(this.playerOptions).then((res) => {
             this.player.getAudioTrackDuration().then((duration) => {
-                // iOS: duration is in seconds
-                // Android: duration is in milliseconds
                 console.log(`song duration:`, duration);
             });
         })
@@ -127,21 +123,43 @@ export class RecorderComponent {
         }
     }
 
+    getEncodedBase64String(buffer) {
+
+        var bytes = new Uint8Array(buffer);
+        var len = buffer.length;
+        var binary = "";
+        for (var i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    }
+
+    getDecordedData(buffer) {
+
+        var binary = atob(buffer);
+        var buffer2 = new ArrayBuffer(binary.length);
+        console.log("NUM", buffer2.byteLength)
+        var arr = new Array(buffer2.byteLength)
+        var bytes = new Uint8Array(buffer2);
+        for (var i = 0; i < buffer2.byteLength; i++) {
+            bytes[i] = binary.charCodeAt(i) & 0xFF;
+            arr[i] = binary.charCodeAt(i) & 0xFF;
+        }
+        return arr;
+    }
+
     getBase64(file: fs.File) {
 
-
-        //encryption algo
         let data = file.readSync();
-        var words = CryptoJS.enc.Utf8.parse(data);
-        this.base64 = CryptoJS.enc.Base64.stringify(words);
+        var data2 = this.getEncodedBase64String(data);
+        this.base64 = data2;
+        var bin = this.getDecordedData(data2)
+        console.log("vin:", bin)
 
-        //decrytion algo
-        // var words2 = CryptoJS.enc.Base64.parse(base64);
-        // var textString = CryptoJS.enc.Utf8.stringify(words2);
-
-        // var fl: fs.File = fs.File.fromPath('/storage/emulated/0/mg.mp3');
-        // fl.writeSync(data);
-
+        var fl = fs.File.fromPath('/storage/emulated/0/mymy.mp3');
+        fl.writeSync(bin, (error => {
+            console.log("ERER:", error)
+        }))
 
     }
 
@@ -154,11 +172,9 @@ export class RecorderComponent {
         };
 
         var body = {
-            "userid": "sinan@karakurt.nl",
+            "userid": "user3@user3.nl",
             "base": "data:audio/mp3;base64," + this.base64
         }
-
-        console.log(body.base);
 
         this.http.post("http://suzie.kiws.nl/rest/api/v1/audio/submit", body, { headers: headers }).subscribe((response: any) => {
             alert("Recording is saved");
@@ -171,6 +187,6 @@ export class RecorderComponent {
     }
 
     onListTap() {
-        this.routerExtensions.navigate(["/detail"]);
+        this.routerExtensions.navigate(["/recordingList"]);
     }
 }

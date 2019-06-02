@@ -4,12 +4,11 @@ import { screen, isAndroid } from "tns-core-modules/platform";
 import { Label } from "tns-core-modules/ui/label/label";
 import { ActivatedRoute } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { ExtendedNavigationExtras } from "nativescript-angular/router/router-extensions";
+import { HttpClient } from "@angular/common/http";
 import { Page, EventData, Observable } from "tns-core-modules/ui/page/page";
 import { ImageSource, fromResource, fromBase64 } from "tns-core-modules/image-source/image-source";
-import { RadialBarIndicator } from "nativescript-ui-gauge";
 import * as application from "tns-core-modules/application";
+import { knownFolders, File } from "tns-core-modules/file-system/file-system";
 
 @Component({
     selector: "Player",
@@ -25,6 +24,13 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('labelRem') labelRemRef: ElementRef;
     @ViewChild('labelPas') labelPasRef: ElementRef;
     @ViewChild('barIndicator') progressIndicatorRef: ElementRef;
+
+
+
+    userId: string;
+    id: number;
+    filePath: string;
+    playerClass: string;
 
     page: Page
 
@@ -63,8 +69,6 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     labelPas;
     progressIndicator;
 
-    // songs = ["https://jatt.download/music/data/Hindi_Movies/201802/Sonu_Ke_Titu_Ki_Sweety/128/Bom_Diggy_Diggy.mp3", "https://jatt.download/music/data/Hindi_Movies/201902/Luka_Chuppi/128/Coca_Cola.mp3", "https://jatt.download/music/data/Hindi_Movies/201808/Satyameva_Jayate/128/Dilbar.mp3"]
-
     song;
     songName
     songId
@@ -86,99 +90,27 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     disc = 80 / this.screenRatio + '%';
     isRendering: boolean;
     renderViewTimeout;
-    constructor(private activatedRoute: ActivatedRoute, private routerExtensions: RouterExtensions, private http: HttpClient,) {
+    constructor(private activatedRoute: ActivatedRoute, private routerExtensions: RouterExtensions, private http: HttpClient, ) {
         this.player = new TNSPlayer();
         this.passedTime = "00"
         this.remainingTime = "00"
         this.isRendering = false;
 
+        this.id = 0;
+        this.userId = "user3@user3.nl"
+
         this.activatedRoute.queryParams.subscribe(params => {
-            // this.songName = params.name;
-            // this.songId = params.id;
-            this.song = JSON.parse(params["song"]);
-            this.songName = this.song.title;
-            console.log("SSSSSSSSSSSSSSSSSS", this.song)
-            // this.songThumbnail = params.thumbnail;
-            // this.songUrl = params.url;
-            // this.songIsFavourite = params.isFavourite;
-
-            // if (this.songName != null && this.songName != undefined && this.songName != "") {
-            // }
-            // if (this.songId != null && this.songId != undefined && this.songId != "") {
-            //     this.getFileById();
-            // }
-
-            // if (this.songService.getPlayer().isAudioPlaying()) {
-            //     var button = this.buttonRef.nativeElement as Button;
-            //     button.backgroundImage = 'res://pause'
-            // }
-            // else {
-            //     var button = this.buttonRef.nativeElement as Button;
-            //     button.backgroundImage = 'res://play'
-            // }
-
-            // if (this.songThumbnail != null && this.songThumbnail != undefined) {
-            //     if (<ImageSource>this.getThumbnailSrc(this.songThumbnail) != null && <ImageSource>this.getThumbnailSrc(this.songThumbnail) != undefined) {
-            //         this.thumbnail = <ImageSource>this.getThumbnailSrc(this.songThumbnail);
-            //     }
-            //     else {
-            //         this.thumbnail = <ImageSource>fromResource("img_video_default");
-            //     }
-            // }
-            // else {
-            //     this.thumbnail = <ImageSource>fromResource("img_video_default");
-            // }
+            this.id = JSON.parse(params["Number"]);
+            this.userId = JSON.parse(params["userid"]);
         })
+        this.userId = "user3@user3.nl"
+        this.filePath = knownFolders.currentApp().getFile('recording.mp3').path;
+        this.playerClass = "button"
 
-        // this.userService.userChanges.subscribe(user => {
-        //     if (user == null || user == undefined) {
-
-        //         let extendedNavigationExtras: ExtendedNavigationExtras = {
-        //             queryParams: {
-        //                 "user": null
-        //             },
-        //         };
-        //         this.routerExtensions.navigate(["/home"], extendedNavigationExtras)
-        //     }
-        // })
-
-        // this.userService.playerButtonChanges.subscribe((state: boolean) => {
-        //     if (state) {
-        //         var button = this.buttonRef.nativeElement as Button;
-        //         button.backgroundImage = 'res://pause'
-        //     }
-        //     else {
-        //         var button = this.buttonRef.nativeElement as Button;
-        //         button.backgroundImage = 'res://play'
-        //     }
-        // })
-
-        const playerOptions = {
-            audioFile: this.song.url,
-            loop: false,
-            autoplay: true,
-        };
-        var that = this;
-        this.player
-            .playFromUrl(playerOptions)
-            .then((res) => {
-                // that.isRendering = true;
-                console.log("EEEEEEE", res);
-                // that.songService.setPlayer(that.player);
-                // GlobalNotificationBuilder.setSongService(this.songService)
-                // var button = this.buttonRef.nativeElement as Button;
-                // button.backgroundImage = 'res://pause'
-            }).then(() => {
-                that.isRendering = true;
-                // console.log("Afterrtrtyryry")
-            })
-            .catch((err) => {
-                console.log("something went wrong...", err);
-            });
+        this.getSongFromServer();
     }
 
     onBackButtonPress() {
-        // this.songService.pause();
         this.routerExtensions.back();
     }
 
@@ -214,36 +146,6 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-
-    getSeconds(duration: number) {
-        return Math.floor((duration / 1000) % 60);
-    }
-
-    getMinutes(duration: number) {
-        return Math.floor((duration / 1000) / 60);
-    }
-
-    getHours(duration: number) {
-        return Math.floor((duration / 1000) / 3600);
-    }
-
-    durationConverter(duration: number) {
-        let seconds: number;
-        let minutes: number;
-        let hours: number;
-        let durationRaw: number
-        durationRaw = duration / 1000;
-
-        if (Math.floor(durationRaw / 60) > 0) {
-            minutes = Math.floor(durationRaw / 60);
-            seconds = durationRaw % 60;
-            if (minutes / 60 > 0) {
-                hours = Math.floor(minutes / 60);
-                minutes = minutes % 60;
-            }
-        }
-    }
-
     ngOnInit() {
         var that = this;
         if (isAndroid) {
@@ -254,163 +156,68 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
 
     }
 
-    // getFileById() {
-    //     let headers = new HttpHeaders({
-    //         "Content-Type": "application/json",
-    //         "x-tenant-code": "music",
-    //         "x-role-key": Values.readString(Values.X_ROLE_KEY, "")
-    //     });
-
-
-    //     this.http.get("http://docs-api-dev.m-sas.com/api/files/" + this.songId, { headers: headers }).subscribe((res: any) => {
-
-    //         if (res.isSuccess) {
-    //             let result: any
-    //             result = res.data
-    //             this.songUrl = result.url;
-    //         }
-    //         else {
-    //             // alert(res.error)
-    //         }
-    //     },
-    //         error => {
-    //             // alert(error)
-    //         })
-    // }
-
-
     ngAfterViewInit(): void {
-        // var button = this.buttonRef.nativeElement as Button;
         var labelPas = this.labelPasRef.nativeElement as Label;
         var labelRem = this.labelRemRef.nativeElement as Label;
-        // button.backgroundImage = 'res://play'
         let that = this;
         that.current = 0;
+    }
 
 
-        // this.renderViewTimeout = setTimeout(() => {
-        //     this.isRendering = true;
-        // }, 1000)
+    async initPlayer() {
+        var that = this;
 
+        const playerOptions = {
+            audioFile: this.filePath,
+            loop: false,
+            autoplay: true,
+        };
 
-        // setInterval(() => {
-        //     let remaining: number = 0;
-        //     // that.current = that.songService.getPlayer().currentTime
-        //     let progress: number = 0;
-        //     let progressIndicator = that.progressIndicatorRef.nativeElement as RadialBarIndicator;
+        await this.player
+            .playFromFile(playerOptions)
+            .then((res) => {
+                console.log("EEEEEEE", res);
+            }).then(() => {
+                that.isRendering = true;
+            })
+            .catch((err) => {
+                console.log("something went wrong...", err);
+            });
+    }
 
-        //     this.songService.getPlayer().getAudioTrackDuration().then((durationStr: string) => {
-        //         let duration = parseInt(durationStr, 10)
-        //         if (duration != NaN && duration != undefined && duration != 0) {
-        //             that.duration = duration;
-        //             if (that.current != NaN && that.current != undefined && that.current != 0) {
-        //                 progress = (that.current / that.duration) * 100;
-        //                 that.progress = progress;
-        //                 progressIndicator.maximum = progress;
-        //                 remaining = that.duration - that.current;
+    async  getSongFromServer() {
 
-        //                 this.currentSec = this.getSeconds(that.current);
-        //                 this.currentMin = this.getMinutes(that.current);
-        //                 this.currentHour = this.getHours(that.current);
+        console.log("US:", this.userId)
+        console.log("id:", this.id)
 
-        //                 this.remainingSec = this.getSeconds(remaining)
-        //                 this.remainingMin = this.getMinutes(remaining)
-        //                 this.remainingHour = this.getHours(remaining)
+        await this.http.get(`http://suzie.kiws.nl/rest/api/v1/audio/recording?userid=${this.userId}&id=${this.id}`).subscribe((res) => {
+            console.log("Res:", res)
 
-
-        //                 var remSec;
-        //                 var remMin;
-        //                 var remHour;
-
-        //                 var pasSec;
-        //                 var pasMin;
-        //                 var pasHour;
-
-        //                 if (this.remainingSec < 10) {
-        //                     remSec = "0" + this.remainingSec;
-        //                 }
-        //                 else {
-        //                     remSec = this.remainingSec;
-        //                 }
-
-        //                 if (this.remainingMin < 10) {
-        //                     remMin = "0" + this.remainingMin;
-        //                 }
-        //                 else {
-        //                     remMin = this.remainingMin;
-        //                 }
-
-        //                 if (this.remainingHour < 10) {
-        //                     remHour = "0" + this.remainingHour;
-        //                 }
-        //                 else {
-        //                     remHour = this.remainingHour;
-        //                 }
-        //                 this.remainingTime = remHour + ":" + remMin + ":" + remSec + "";
-
-        //                 if (this.currentSec < 10) {
-        //                     pasSec = "0" + this.currentSec;
-        //                 }
-        //                 else {
-        //                     pasSec = this.currentSec;
-        //                 }
-
-        //                 if (this.currentMin < 10) {
-        //                     pasMin = "0" + this.currentMin;
-        //                 }
-        //                 else {
-        //                     pasMin = this.currentMin;
-        //                 }
-
-        //                 if (this.currentHour < 10) {
-        //                     pasHour = "0" + this.currentHour;
-        //                 }
-        //                 else {
-        //                     pasHour = this.currentHour;
-        //                 }
-
-        //                 this.passedTime = pasHour + ":" + pasMin + ":" + pasSec + "";
-        //                 labelPas.text = this.passedTime;
-        //                 labelRem.text = this.remainingTime;
-        //             }
-        //             else {
-        //                 progress = 0;
-        //                 that.progress = progress;
-        //                 progressIndicator.maximum = progress;
-        //             }
-        //         }
-        //     })
-        // }, 1000);
-
+            this.initPlayer();
+            this.isPlaying = true;
+        }, error => {
+            console.log("Error:", error);
+        })
     }
 
     playPause() {
-        // if (this.songService.getPlayer().isAudioPlaying()) {
-        //     this.songService.playerState(false);
-        //     this.songService.getPlayer().pause();
-        //     var button = this.buttonRef.nativeElement as Button;
-        //     button.backgroundImage = 'res://play'
-        //     console.log("SER:", this.songService)
-
-        // } else {
-        //     this.songService.getPlayer().play();
-        //     this.songService.playerState(true);
-        //     var button = this.buttonRef.nativeElement as Button;
-        //     button.backgroundImage = 'res://pause'
-        //     console.log("SER:", this.songService)
-        // }
+        if (this.isPlaying) {
+            this.isPlaying = false;
+            this.playerClass = "buttonPause"
+        } else {
+            this.isPlaying = false;
+            this.playerClass = "button"
+        }
     }
 
-  
+
     ngOnDestroy() {
         if (isAndroid) {
             application.off(application.AndroidApplication.activityBackPressedEvent, (result) => {
                 console.log("Removed")
             });
-
         }
 
-        // this.songService.getPlayer().dispose()
         clearInterval(this._checkInterval);
         clearTimeout(this.renderViewTimeout);
     }

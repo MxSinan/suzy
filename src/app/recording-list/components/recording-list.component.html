@@ -1,9 +1,14 @@
-<Page>
-    <GridLayout class="page">
-        <ListView [items]="recordings" (itemTap)="onItemTap($event)">
-            <ng-template let-recording="item" let-i="index">
-                <!-- The item template can only have a single root view container (e.g. GridLayout, StackLayout, etc.)-->
-                    <Label [text]="recording.name"></Label>
+<Page (loaded)="pageLoaded($event)" (unloaded)="pageUnloaded($event)">
+    <GridLayout height="100%" width="100%">
+        <ListView height="100%" separatorColor="gray" [items]="recordingList" (itemTap)="onItemTap($event)">
+            <ng-template let-item="item" let-i="index">
+                <GridLayout rows="auto, auto" columns="auto, auto, auto" height="10%">
+                    <Image margin="10" col="0" row="0" width="45" height="45" src="res://mic">
+                    </Image>
+                    <StackLayout row="0" col="1" verticalAlignment="center" height="40">
+                        <Label class="site-template-description" [text]="item.Number"></Label>
+                    </StackLayout>
+                </GridLayout>
             </ng-template>
         </ListView>
     </GridLayout>
