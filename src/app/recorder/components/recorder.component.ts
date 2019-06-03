@@ -78,6 +78,8 @@ export class RecorderComponent {
     }
 
     onCancelTap() {
+        this.recordingFile = fs.File.fromPath(fs.path.join(fs.knownFolders.currentApp().getFolder('audio').path, 'recording.mp3'));
+        this.recordingFile.remove();
         this.showPlay = false;
         this.showPause = false;
         this.showConfirm = false;
@@ -186,6 +188,8 @@ export class RecorderComponent {
             this.showPlay = false;
             this.showPause = false;
             this.showConfirm = false;
+            this.recordingFile = fs.File.fromPath(fs.path.join(fs.knownFolders.currentApp().getFolder('audio').path, 'recording.mp3'));
+            this.recordingFile.remove();
         }, error => {
             console.log("error is", error);
         });
