@@ -109,7 +109,7 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         })
         this.userId = "user3@user3.nl"
         // this.filePath = knownFolders.currentApp().getFile('recording.mp3').path;
-        this.filePath = '/storage/emulated/0/rec.mp3'
+        this.filePath = '/storage/emulated/0/BA.mp3'
         this.playerClass = "button"
 
         this.getSongFromServer();
