@@ -11,7 +11,6 @@ import { RecorderComponent } from "./components/recorder.component";
         RecorderRoutingModule
     ],
     declarations: [
-        RecorderComponent
     ],
     schemas: [
         NO_ERRORS_SCHEMA

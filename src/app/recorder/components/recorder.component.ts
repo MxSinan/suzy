@@ -124,28 +124,33 @@ export class RecorderComponent {
     }
 
     getEncodedBase64String(buffer) {
+        console.log("WIS:", buffer)
+
 
         var bytes = new Uint8Array(buffer);
+        console.log("IS:", bytes)
+
         var len = buffer.length;
         var binary = "";
         for (var i = 0; i < len; i++) {
             binary += String.fromCharCode(bytes[i]);
         }
+        console.log("BIN:", binary)
+        console.log("BA:", btoa(binary))
+
         return btoa(binary);
     }
 
     getDecordedData(buffer) {
 
         var binary = atob(buffer);
+        console.log("Length:", binary.length)
         var buffer2 = new ArrayBuffer(binary.length);
-        console.log("NUM", buffer2.byteLength)
-        var arr = new Array(buffer2.byteLength)
         var bytes = new Uint8Array(buffer2);
         for (var i = 0; i < buffer2.byteLength; i++) {
-            bytes[i] = binary.charCodeAt(i) & 0xFF;
-            arr[i] = binary.charCodeAt(i) & 0xFF;
+            buffer2[i] = binary.charCodeAt(i) & 0xFF;
         }
-        return arr;
+        return new Buffer(buffer2);
     }
 
     getBase64(file: fs.File) {

@@ -9,6 +9,10 @@ import { Page, EventData, Observable } from "tns-core-modules/ui/page/page";
 import { ImageSource, fromResource, fromBase64 } from "tns-core-modules/image-source/image-source";
 import * as application from "tns-core-modules/application";
 import { knownFolders, File } from "tns-core-modules/file-system/file-system";
+import { Buffer } from 'buffer'
+import * as btoa from 'btoa'
+import * as atob from 'atob'
+
 
 @Component({
     selector: "Player",
@@ -104,7 +108,8 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
             this.userId = JSON.parse(params["userid"]);
         })
         this.userId = "user3@user3.nl"
-        this.filePath = knownFolders.currentApp().getFile('recording.mp3').path;
+        // this.filePath = knownFolders.currentApp().getFile('recording.mp3').path;
+        this.filePath = '/storage/emulated/0/rec.mp3'
         this.playerClass = "button"
 
         this.getSongFromServer();
@@ -164,8 +169,41 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
 
-    async initPlayer() {
+
+    getDecordedData(buffer: any): any {
+
+        var binary = atob(buffer);
+        return binary;
+        // var buffer2 = new ArrayBuffer(binary.length);
+        // var bytes = new Uint8Array(buffer2);
+        // for (var i = 0; i < bytes.byteLength; i++) {
+        //     bytes[i] = binary.charCodeAt(i) & 0xFF;
+        // }
+        // console.log("BFFF:", buffer2)
+        // return new Buffer(bytes);
+    }
+
+    async initPlayer(base: string) {
         var that = this;
+        console.log("ARR1", base)
+
+        var file: File = File.fromPath(this.filePath);
+        var arr = this.getDecordedData(base)
+        // // console.trace("ARR:", JSON.stringify(arr))
+        // var string = JSON.stringify(arr);
+
+        // var sub = string.substring(24)
+
+        // var sub2 = sub.substring(0, sub.length - 1);
+        // var narr = JSON.parse(sub2)
+
+        // console.trace("Sub:", narr)
+
+
+
+        file.writeText(arr)
+
+        console.log("Comp")
 
         const playerOptions = {
             audioFile: this.filePath,
@@ -190,10 +228,10 @@ export class PlayerComponent implements OnInit, OnDestroy, AfterViewInit {
         console.log("US:", this.userId)
         console.log("id:", this.id)
 
-        await this.http.get(`http://suzie.kiws.nl/rest/api/v1/audio/recording?userid=${this.userId}&id=${this.id}`).subscribe((res) => {
+        await this.http.get(`http://suzie.kiws.nl/rest/api/v1/audio/recording?userid=${this.userId}&id=${this.id}`).subscribe((res: any) => {
             console.log("Res:", res)
 
-            this.initPlayer();
+            this.initPlayer(res.base64);
             this.isPlaying = true;
         }, error => {
             console.log("Error:", error);

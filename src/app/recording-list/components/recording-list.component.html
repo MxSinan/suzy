@@ -1,4 +1,4 @@
-<Page (loaded)="pageLoaded($event)" (unloaded)="pageUnloaded($event)">
+<Page  (unloaded)="pageUnloaded()">
     <GridLayout height="100%" width="100%">
         <ListView height="100%" separatorColor="gray" [items]="recordingList" (itemTap)="onItemTap($event)">
             <ng-template let-item="item" let-i="index">

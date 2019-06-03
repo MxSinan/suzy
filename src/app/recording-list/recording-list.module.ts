@@ -11,7 +11,6 @@ import { RecordingListComponent } from "./components/recording-list.component";
         RecordingListRoutingModule
     ],
     declarations: [
-        RecordingListComponent
     ],
     schemas: [
         NO_ERRORS_SCHEMA
